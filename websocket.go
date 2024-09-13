@@ -2,7 +2,6 @@ package goproxy
 
 import (
 	"bufio"
-	"bytes"
 	"crypto/tls"
 	"io"
 	"net/http"
@@ -131,11 +130,7 @@ func (proxy *ProxyHttpServer) websocketHandshake(ctx *ProxyCtx, req *http.Reques
 func (proxy *ProxyHttpServer) proxyWebsocket(ctx *ProxyCtx, dest io.ReadWriter, source io.ReadWriter) {
 	errChan := make(chan error, 2)
 	cp := func(dst io.Writer, src io.Reader) {
-		ss := bufio.NewReader(src)
-		bt := make([]byte, 100000)
-		ss.Read(bt)
-		ctx.Logf(string(bt))
-		_, err := io.Copy(dst, bytes.NewReader(bt))
+		_, err := io.Copy(dst, src)
 		ctx.Warnf("Websocket error: %v", err)
 		errChan <- err
 	}
