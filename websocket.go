@@ -141,8 +141,8 @@ func (proxy *ProxyHttpServer) proxyWebsocket(ctx *ProxyCtx, dest io.ReadWriter, 
 	teeSource := io.TeeReader(source, &bufSource)
 
 	// Start proxying websocket data
-	go cp(dest, teeDest)
-	go cp(source, teeSource)
+	go cp(dest, teeSource)
+	go cp(source, teeDest)
 	<-errChan
 
 	go func() {
