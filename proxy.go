@@ -141,7 +141,7 @@ func (proxy *ProxyHttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 		if resp == nil {
 			if isWebSocketRequest(r) {
-				ctx.Logf("Request looks like websocket upgrade.")
+				ctx.Logf("Request looks like websocket upgrade px.")
 				proxy.serveWebsocket(ctx, w, r)
 			}
 
