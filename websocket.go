@@ -143,7 +143,6 @@ func (proxy *ProxyHttpServer) proxyWebsocket(ctx *ProxyCtx, dest io.ReadWriter, 
 	// Start proxying websocket data
 	go cp(dest, teeSource)
 	go cp(source, teeDest)
-	<-errChan
 
 	go func() {
 		bt, _ := io.ReadAll(&bufDest)
@@ -154,4 +153,6 @@ func (proxy *ProxyHttpServer) proxyWebsocket(ctx *ProxyCtx, dest io.ReadWriter, 
 		bt, _ := io.ReadAll(&bufSource)
 		ctx.Logf("r src: %s\n", string(bt))
 	}()
+
+	<-errChan
 }
