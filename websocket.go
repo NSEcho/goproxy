@@ -2,6 +2,7 @@ package goproxy
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/tls"
 	"io"
 	"net/http"
@@ -135,8 +136,22 @@ func (proxy *ProxyHttpServer) proxyWebsocket(ctx *ProxyCtx, dest io.ReadWriter, 
 		errChan <- err
 	}
 
+	var bufDest, bufSource bytes.Buffer
+	teeDest := io.TeeReader(dest, &bufDest)
+	teeSource := io.TeeReader(source, &bufSource)
+
 	// Start proxying websocket data
-	go cp(dest, source)
-	go cp(source, dest)
+	go cp(dest, teeDest)
+	go cp(source, teeSource)
 	<-errChan
+
+	go func() {
+		bt, _ := io.ReadAll(&bufDest)
+		ctx.Logf("r dest: %s\n", string(bt))
+	}()
+
+	go func() {
+		bt, _ := io.ReadAll(&bufSource)
+		ctx.Logf("r src: %s\n", string(bt))
+	}()
 }
