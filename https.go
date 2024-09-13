@@ -267,7 +267,7 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 						return
 					}
 					if isWebSocketRequest(req) {
-						ctx.Logf("Request looks like websocket upgrade ht.")
+						ctx.Logf("Request looks like websocket upgrade.")
 						if req.URL.Scheme == "http" {
 							ctx.Logf("Enforced HTTP websocket forwarding over TLS")
 							proxy.serveWebsocketHttpOverTLS(ctx, w, req, rawClientTls)
