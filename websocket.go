@@ -40,6 +40,20 @@ func (proxy *ProxyHttpServer) serveWebsocketTLS(ctx *ProxyCtx, w http.ResponseWr
 	ctx.Logf("client conn: %s", clientConn.RemoteAddr())
 	ctx.Logf("target conn: %s", targetConn.RemoteAddr())
 
+	go func() {
+		buf := new(bytes.Buffer)
+		io.Copy(buf, clientConn)
+		ctx.Logf("read: %s", buf.String())
+		io.Copy(targetConn, clientConn)
+	}()
+
+	go func() {
+		buf := new(bytes.Buffer)
+		io.Copy(buf, targetConn)
+		ctx.Logf("read: %s", buf.String())
+		io.Copy(clientConn, targetConn)
+	}()
+
 	// Perform handshake
 	if err := proxy.websocketHandshake(ctx, req, targetConn, clientConn); err != nil {
 		ctx.Warnf("Websocket handshake error: %v", err)
@@ -47,7 +61,7 @@ func (proxy *ProxyHttpServer) serveWebsocketTLS(ctx *ProxyCtx, w http.ResponseWr
 	}
 
 	// Proxy wss connection
-	proxy.proxyWebsocket(ctx, targetConn, clientConn)
+	// proxy.proxyWebsocket(ctx, targetConn, clientConn)
 }
 
 func (proxy *ProxyHttpServer) serveWebsocketHttpOverTLS(ctx *ProxyCtx, w http.ResponseWriter, req *http.Request, clientConn *tls.Conn) {
