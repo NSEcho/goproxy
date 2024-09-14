@@ -41,17 +41,21 @@ func (proxy *ProxyHttpServer) serveWebsocketTLS(ctx *ProxyCtx, w http.ResponseWr
 	ctx.Logf("target conn: %s", targetConn.RemoteAddr())
 
 	go func() {
-		buf := new(bytes.Buffer)
-		io.Copy(buf, clientConn)
-		ctx.Logf("read: %s", buf.String())
-		io.Copy(targetConn, clientConn)
+		for {
+			buf := new(bytes.Buffer)
+			io.Copy(buf, clientConn)
+			ctx.Logf("read: %s", buf.String())
+			io.Copy(targetConn, buf)
+		}
 	}()
 
 	go func() {
-		buf := new(bytes.Buffer)
-		io.Copy(buf, targetConn)
-		ctx.Logf("read: %s", buf.String())
-		io.Copy(clientConn, targetConn)
+		for {
+			buf := new(bytes.Buffer)
+			io.Copy(buf, targetConn)
+			ctx.Logf("read: %s", buf.String())
+			io.Copy(clientConn, buf)
+		}
 	}()
 
 	// Perform handshake
