@@ -89,6 +89,8 @@ func (proxy *ProxyHttpServer) serveWebsocket(ctx *ProxyCtx, w http.ResponseWrite
 		return
 	}
 
+	ctx.Logf("hijacked: %s", clientConn.RemoteAddr())
+
 	// Perform handshake
 	if err := proxy.websocketHandshake(ctx, req, targetConn, clientConn); err != nil {
 		ctx.Warnf("Websocket handshake error: %v", err)
