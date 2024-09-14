@@ -37,6 +37,9 @@ func (proxy *ProxyHttpServer) serveWebsocketTLS(ctx *ProxyCtx, w http.ResponseWr
 	}
 	defer targetConn.Close()
 
+	ctx.Logf("client conn: %s", clientConn.RemoteAddr())
+	ctx.Logf("target conn: %s", targetConn.RemoteAddr())
+
 	// Perform handshake
 	if err := proxy.websocketHandshake(ctx, req, targetConn, clientConn); err != nil {
 		ctx.Warnf("Websocket handshake error: %v", err)
