@@ -43,18 +43,24 @@ func (proxy *ProxyHttpServer) serveWebsocketTLS(ctx *ProxyCtx, w http.ResponseWr
 	go func() {
 		for {
 			buf := new(bytes.Buffer)
-			io.Copy(buf, clientConn)
-			ctx.Logf("read: %s", buf.String())
-			io.Copy(targetConn, buf)
+			r := io.TeeReader(clientConn, buf)
+			io.Copy(targetConn, r)
+			s := buf.String()
+			if s != "" {
+				ctx.Logf("read c: %s", s)
+			}
 		}
 	}()
 
 	go func() {
 		for {
 			buf := new(bytes.Buffer)
-			io.Copy(buf, targetConn)
-			ctx.Logf("read: %s", buf.String())
-			io.Copy(clientConn, buf)
+			r := io.TeeReader(targetConn, buf)
+			io.Copy(clientConn, r)
+			s := buf.String()
+			if s != "" {
+				ctx.Logf("read t: %s", s)
+			}
 		}
 	}()
 
