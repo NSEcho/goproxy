@@ -60,6 +60,7 @@ func isEof(r *bufio.Reader) bool {
 
 func (proxy *ProxyHttpServer) filterRequest(r *http.Request, ctx *ProxyCtx) (req *http.Request, resp *http.Response) {
 	req = r
+	ctx.Warnf("scheme is: %s, method %s, host %s", r.URL.String(), r.Method, r.Host)
 	for _, h := range proxy.reqHandlers {
 		ctx.Warnf("sending %v", h)
 		req, resp = h.Handle(r, ctx)
